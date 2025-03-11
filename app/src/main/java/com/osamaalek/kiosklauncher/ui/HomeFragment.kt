@@ -1,6 +1,7 @@
 package com.osamaalek.kiosklauncher.ui
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var fabApps: FloatingActionButton
     private lateinit var imageButtonExit: ImageButton
+    private var backPressCount = 0 // Contador de cliques no botão de voltar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -33,7 +35,22 @@ class HomeFragment : Fragment() {
             KioskUtil.stopKioskMode(requireActivity())
         }
 
+        // Configura o listener para o botão de voltar
+        v.isFocusableInTouchMode = true
+        v.requestFocus()
+        v.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
+                backPressCount++
+                if (backPressCount >= 4) {
+                    KioskUtil.stopKioskMode(requireActivity())
+                    backPressCount = 0 // Reseta o contador
+                }
+                true
+            } else {
+                false
+            }
+        }
+
         return v
     }
-
 }
